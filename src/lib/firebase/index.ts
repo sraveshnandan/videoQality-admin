@@ -31,6 +31,7 @@ const sendPushNotification = async (
     const response = await admin.messaging().sendEachForMulticast(message);
     return { success: true, response };
   } catch (error: any) {
+    console.log("error in not fn", error);
     return {
       success: false,
       message: "Unable to send push notification.",

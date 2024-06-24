@@ -13,7 +13,7 @@ const handler = async (req: NextRequest) => {
       const body = "This is a test notification";
 
       const res = await sendPushNotification(deviceTokens, title, body);
-
+      console.log(res);
       return ApiResponse(
         NextResponse,
         "Welcome to firebase messaging Api.",

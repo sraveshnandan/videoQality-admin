@@ -1,5 +1,7 @@
 import { cloudinary } from "@/lib/cloudinary";
 import { TaskModel } from "@/lib/database/models/task.model";
+import { sendPushNotification } from "@/lib/firebase";
+import { deviceTokens } from "@/utils";
 import { NextRequest, NextResponse } from "next/server";
 
 const handler = async (req: NextRequest) => {
@@ -9,7 +11,7 @@ const handler = async (req: NextRequest) => {
       const video = data.get("video") as File;
       const taskId = data.get("taskId") as string;
 
-      const task = await TaskModel.findById(taskId);
+      const task = await TaskModel.findById(taskId).populate("user moderator");
 
       if (!task) {
         return NextResponse.json({
@@ -42,6 +44,11 @@ const handler = async (req: NextRequest) => {
       await task.save();
 
       // notification system integration
+
+      const title = `New Video Submission.`;
+      const body = `Moderator ${task.moderator.first_name} submitted a  video task requested by ${task.user.first_name}`;
+
+      await sendPushNotification(deviceTokens, title, body);
 
       return NextResponse.json({
         success: true,
