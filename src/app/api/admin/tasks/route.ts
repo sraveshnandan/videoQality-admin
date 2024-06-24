@@ -1,4 +1,5 @@
 import { TaskModel } from "@/lib/database/models/task.model";
+import { UserModel } from "@/lib/database/models/user.model";
 import { connectToDatabase } from "@/lib/database/mongoose";
 import { sendPushNotification } from "@/lib/firebase";
 import { deviceTokens } from "@/utils";
@@ -7,6 +8,8 @@ import { NextRequest, NextResponse } from "next/server";
 const handler = async (req: NextRequest) => {
   try {
     await connectToDatabase();
+
+    const userss = await UserModel.find({});
     if (req.method === "GET") {
       const tasks = await TaskModel.find({})
         .sort({ createdAt: -1 })

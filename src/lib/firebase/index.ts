@@ -8,7 +8,7 @@ const serviceAccount = {
 };
 
 // Initialize the Firebase Admin SDK
-if (!admin.app.length) {
+if (!admin.apps.length) {
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
   });
