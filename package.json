@@ -11,6 +11,8 @@
   "dependencies": {
     "cloudinary": "^2.2.0",
     "firebase-admin": "^12.2.0",
+    "fs": "^0.0.1-security",
+    "lucide-react": "^0.396.0",
     "mongodb": "^6.7.0",
     "mongoose": "^8.4.3",
     "next": "14.2.4",

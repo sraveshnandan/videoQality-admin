@@ -7,9 +7,10 @@ export interface ITask extends Document {
   finalVideo: string;
   prompt: string;
   status: string;
-  moderator: IUser;
+  moderator: Schema.Types.ObjectId | IUser;
   editing_type: string;
-  user: IUser;
+  user: Schema.Types.ObjectId | IUser;
+  createdAt: Date;
 }
 
 const TaskSchema = new Schema<ITask>(
@@ -23,7 +24,7 @@ const TaskSchema = new Schema<ITask>(
     },
     prompt: { type: String, required: true },
     moderator: { type: Schema.Types.ObjectId, ref: "User" },
-    editing_type: { type: String, required: true },
+    editing_type: { type: String },
     user: { type: Schema.Types.ObjectId, ref: "User" },
   },
   { timestamps: true }

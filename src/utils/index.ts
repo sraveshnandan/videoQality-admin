@@ -1,4 +1,5 @@
 import { ITask } from "@/lib/database/models/task.model";
+import { IUser } from "@/lib/database/models/user.model";
 
 // function to send api response
 const ApiResponse = (
@@ -23,4 +24,13 @@ const FetchAllTask = async (nextFun: (params: ITask[]) => void) => {
   }
 };
 
-export { ApiResponse, FetchAllTask };
+const SetUserProfile = (next: (params: IUser) => void) => {
+  console.log("user fn runs");
+  const user = localStorage.getItem("user");
+  if (user !== null) {
+    return next(JSON.parse(user as any));
+  }
+  return;
+};
+
+export { ApiResponse, FetchAllTask, SetUserProfile };

@@ -18,21 +18,19 @@ if (!cached) {
 
 export const connectToDatabase = async () => {
   if (cached.conn) {
-    console.log("Database connected through previous connection.");
     return cached.conn;
   }
 
-  if (!MONGODB_URL) throw new Error("Missing MONGODB_URL");
-
-  cached.promise =
-    cached.promise ||
-    mongoose.connect(MONGODB_URL, {
-      dbName: "vido_quality",
+  if (!cached.promise) {
+    const opts = {
       bufferCommands: false,
+      dbName: "vido_quality",
+    };
+
+    cached.promise = mongoose.connect(MONGODB_URL!, opts).then((mongoose) => {
+      return mongoose;
     });
-
+  }
   cached.conn = await cached.promise;
-  console.log("Database is connected.");
-
   return cached.conn;
 };

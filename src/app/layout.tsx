@@ -3,7 +3,6 @@ import "./globals.css";
 import { Toaster } from "react-hot-toast";
 
 import { Aldrich } from "next/font/google";
-import Providers from "@/components/main-providers";
 
 //👇 Configure our font object
 const poppins = Aldrich({
@@ -27,7 +26,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`max-w-7xl bg-dark-bg   mx-auto  `}>
         <Toaster position="top-right" />
-        <Providers> {children}</Providers>
+        {children}
       </body>
     </html>
   );
