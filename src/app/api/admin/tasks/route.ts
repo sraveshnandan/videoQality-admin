@@ -14,11 +14,6 @@ const handler = async (req: NextRequest) => {
       const tasks = await TaskModel.find({})
         .sort({ createdAt: -1 })
         .populate("user moderator");
-
-      const title = `Someone fetched all tasked.`;
-      const body = `Task fetch request fetched successfully.`;
-
-      await sendPushNotification(deviceTokens, title, body);
       // if there is any tasks exists in database
       if (tasks.length > 0) {
         return NextResponse.json({

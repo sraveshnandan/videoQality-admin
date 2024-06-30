@@ -14,17 +14,17 @@ const TaskSubmitPage = () => {
   const router = useRouter();
   const { tasks, user, setTasks, setUser } = useStore();
   const [task, settask] = useState<ITask | null>(null);
-  const [vidFile, setvidFile] = useState<File | null>(null);
+  const [vidurl, setvidurl] = useState<string | null>(null);
   const [loading, setloading] = useState<boolean>(false);
 
   const handleTaskSubmit = async () => {
     setloading(true);
-    if (vidFile === null) {
+    if (vidurl === null) {
       return toast.error("Edited video file is required");
     }
 
     const formData = new FormData();
-    formData.append("video", vidFile as any);
+    formData.append("videourl", vidurl as any);
     formData.append("taskId", task?._id as any);
 
     const res = await fetch("/api/admin/video", {
@@ -51,25 +51,32 @@ const TaskSubmitPage = () => {
 
   // refressing task
   useEffect(() => {
-    FetchAllTask((params) => {
-      if (!tasks?.length) {
-        setTasks(params);
-      }
-    });
+    if (!tasks?.length) {
+      setloading(true);
+      FetchAllTask((params) => {
+        setloading(false);
+        if (!tasks?.length) {
+          setTasks(params);
+        }
+      });
+    }
     // filtering current task
     const t = tasks?.find((t) => t._id!.toString() === params.id);
     settask(t as any);
   }, [tasks]);
   // refressing user
   useEffect(() => {
-    setloading(true);
-    SetUserProfile((params) => {
-      setloading(false);
-      if (!user?._id) {
-        return setUser(params);
-      }
-      return;
-    });
+    if (!user?.first_name) {
+      setloading(true);
+      SetUserProfile((params) => {
+        setloading(false);
+        if (!user?._id) {
+          return setUser(params);
+        }
+        return;
+      });
+    }
+    return () => {};
   }, [user]);
   return loading ? (
     <Loader />
@@ -101,7 +108,7 @@ const TaskSubmitPage = () => {
             <div className="flex text-xl line-clamp-1 font-semibold   w-fit mb-2  flex-row items-center gap-2">
               Type:{" "}
               <span className=" text-purple-400 text-lg line-clamp-1">
-                {task?.prompt}
+                {task?.editing_type}
               </span>
               <span className="text-white cursor-pointer"></span>
             </div>
@@ -148,7 +155,7 @@ const TaskSubmitPage = () => {
             <span className="text-white mb-1 border-b-[2px] text-lg font-semibold">
               Edited Video
             </span>
-            <Uploader rawVideoFile={setvidFile} />
+            <Uploader rawVideoFile={setvidurl} />
           </div>
         </div>
 

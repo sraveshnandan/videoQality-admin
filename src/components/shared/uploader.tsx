@@ -1,42 +1,24 @@
 "use client";
 
-import { LucideShieldClose, LucideUploadCloud } from "lucide-react";
-import { ChangeEvent, Dispatch, SetStateAction, useRef, useState } from "react";
-import { toast } from "react-hot-toast";
+import { LucideShieldClose, UploadCloud } from "lucide-react";
+import { Dispatch, SetStateAction, useState } from "react";
+
+import { CldUploadWidget } from "next-cloudinary";
 
 type Props = {
-  rawVideoFile?: Dispatch<SetStateAction<File | null>>;
-  vidurl?: Dispatch<SetStateAction<string | null>>;
+  rawVideoFile: Dispatch<SetStateAction<string | null>>;
 };
 
-const Uploader = ({ rawVideoFile, vidurl }: Props) => {
+const Uploader = ({ rawVideoFile }: Props) => {
   const [file, setfile] = useState<File | null>(null);
   const [previewUrl, setpreviewUrl] = useState<string | null>(null);
 
-  const handleChange = (ev: ChangeEvent<HTMLInputElement>) => {
-    if (ev.target.files![0].size > 100 * 1024 * 1024) {
-      return toast.error("Max Video size is 100 Mb.");
-    }
-    setfile(ev.target.files![0]);
-    if (rawVideoFile) {
-      rawVideoFile(ev.target.files![0]);
-      setpreviewUrl(
-        (window.URL || window.webkitURL).createObjectURL(ev.target.files![0])
-      );
-    }
-
-    setpreviewUrl(
-      (window.URL || window.webkitURL).createObjectURL(ev.target.files![0])
-    );
-  };
   return (
-    <div className="flex   bg-glass shadow-md shadow-black   w-full rounded-md  h-fit items-center justify-center flex-col overflow-hidden p-4">
+    <div className="flex  bg-glass shadow-md shadow-black   w-full rounded-md xl:h-[380px] h-fit items-center justify-center flex-col overflow-hidden p-4">
       {/* preview section  */}
 
       {previewUrl ? (
         <div className="flex items-center justify-center  relative flex-grow">
-          {/* video preview  */}
-
           {/* cancle button  */}
 
           <div
@@ -48,37 +30,45 @@ const Uploader = ({ rawVideoFile, vidurl }: Props) => {
           >
             <LucideShieldClose size={34} color="red" />
           </div>
+          {/* video preview  */}
           <video
             src={previewUrl}
             controls
-            className="w-full rounded-md h-full"
+            muted
+            className="rounded-md w-fit h-fit"
           ></video>
         </div>
       ) : (
-        <form className={`flex flex-col gap-2`}>
-          {/* upload lable  */}
-          <label
-            htmlFor="vid"
-            className="bg-white/40 hover:bg-gradient-to-tr from-pink-500 to-indigo-500  text-black rounded-md px-5  py-2 cursor-pointer group duration-300 transition-all"
+        <>
+          <CldUploadWidget
+            options={{
+              maxFiles: 1,
+              multiple: false,
+              clientAllowedFormats: ["mp4", "mov", "avi", "m4a", "webm"],
+              maxFileSize: 100000000,
+            }}
+            onSuccess={(res) => {
+              setpreviewUrl(res.info?.secure_url);
+              rawVideoFile(res.info.secure_url);
+            }}
+            uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!}
           >
-            <LucideUploadCloud size={140} className="group-hover:text-white" />
-          </label>
-          <input
-            onChange={(ev) => handleChange(ev)}
-            type="file"
-            hidden
-            required
-            id="vid"
-            accept="video/*"
-            className="mb-4"
-            maxLength={10 * 1024 * 1024}
-          />
-
-          <span className="text-white font-semibold">Choose from device.</span>
+            {({ open }) => {
+              return (
+                <button
+                  className="bg-white flex flex-col items-center gap-2 p-4 text-black rounded-xl my-2 font-medium"
+                  onClick={() => open()}
+                >
+                  <UploadCloud size={55} />
+                  Upload an Video
+                </button>
+              );
+            }}
+          </CldUploadWidget>
           <span className="text-white font-semibold text-center">
             Max Size: 100 Mb
           </span>
-        </form>
+        </>
       )}
     </div>
   );

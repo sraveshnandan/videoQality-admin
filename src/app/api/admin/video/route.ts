@@ -1,4 +1,3 @@
-import { cloudinary } from "@/lib/cloudinary";
 import { TaskModel } from "@/lib/database/models/task.model";
 import { sendPushNotification } from "@/lib/firebase";
 import { deviceTokens } from "@/utils";
@@ -8,7 +7,7 @@ const handler = async (req: NextRequest) => {
   try {
     if (req.method === "POST") {
       const data = await req.formData();
-      const video = data.get("video") as File;
+      const videourl = data.get("videourl") as string;
       const taskId = data.get("taskId") as string;
 
       const task = await TaskModel.findById(taskId).populate("user moderator");
@@ -20,26 +19,7 @@ const handler = async (req: NextRequest) => {
         });
       }
 
-      const bufer = await video.arrayBuffer();
-      const chunks = new Uint8Array(bufer);
-
-      const uploadRes: any = await new Promise((resolve, reject) => {
-        const uploadStream = cloudinary.uploader.upload_stream(
-          {
-            resource_type: "video",
-            folder: "VideoQuality",
-          },
-          (err, res) => {
-            if (err) {
-              reject(err);
-            } else {
-              resolve(res);
-            }
-          }
-        );
-        uploadStream.end(chunks);
-      });
-      task.finalVideo = uploadRes.secure_url;
+      task.finalVideo = videourl;
       task.status = "completed";
       await task.save();
 
@@ -52,7 +32,6 @@ const handler = async (req: NextRequest) => {
 
       return NextResponse.json({
         success: true,
-        response: uploadRes,
         message: "Task submitted successfully.",
       });
     }
